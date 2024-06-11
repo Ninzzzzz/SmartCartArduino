@@ -1,0 +1,46 @@
+// Define Ultrasonic distance sensor pins
+#define trigPin 12
+#define echoPin 13
+// Define HD-4T126x transmitter pins
+#define leftPin 10
+#define rightPin 8
+#define forwardPin 9
+// Define distance thresholds
+#define minDistance 10 // in cm
+#define maxDistance 50 // in cm
+// Define angle thresholds
+#define leftAngleThreshold 20 // in degrees #define rightAngleThreshold 160 // in degrees
+void setup() {
+// initialize serial communication Serial.begin(9600);
+// initialize Ultrasonic distance sensor pins pinMode(trigPin, OUTPUT); pinMode(echoPin, INPUT);
+// initialize HD-4T126x transmitter pins pinMode(leftPin, OUTPUT); pinMode(rightPin, OUTPUT); pinMode(forwardPin, OUTPUT);
+}
+void loop() {
+// send a 10us pulse to the Ultrasonic distance sensor to start the measurement
+digitalWrite(trigPin, LOW); delayMicroseconds(2); digitalWrite(trigPin, HIGH); delayMicroseconds(10); digitalWrite(trigPin, LOW); // measure the duration of the echo pulse, and convert it to distance in cm
+long duration = pulseIn(echoPin, HIGH); float distance = duration * 0.034 / 2;
+// print the distance to the serial monitor
+Serial.print("Distance: ");
+Serial.print(distance);
+Serial.println(" cm");
+// check if the distance is within the desired range if (distance >= minDistance && distance <= maxDistance) {
+// calculate the angle of the detected object relative to the center of the Ultrasonic distance sensor int angle = (int)(atan2(distance, 5) * 180 / PI);
+// print the angle to the serial monitor
+Serial.print("Angle: ");
+Serial.print(angle);
+Serial.println(" degrees");
+// check if the angle is within the left threshold if (angle < -leftAngleThreshold) {
+// if the angle is within the left threshold, send signals to the toy car to turn left digitalWrite(leftPin, HIGH); digitalWrite(rightPin, LOW); digitalWrite(forwardPin, LOW);
+}
+// check if the angle is within the right threshold else if (angle > rightAngleThreshold) {
+// if the angle is within the right threshold, send signals to the toy car to turn right digitalWrite(leftPin, LOW); digitalWrite(rightPin, HIGH); digitalWrite(forwardPin, LOW);
+}
+// otherwise, send signals to the toy car to move forward else {
+digitalWrite(leftPin, LOW); digitalWrite(rightPin, LOW); digitalWrite(forwardPin, HIGH);
+}
+} else {
+// if the distance is not within range, stop the toy car digitalWrite(leftPin, LOW); digitalWrite(rightPin, LOW); digitalWrite(forwardPin, LOW);
+}
+// wait for a moment before measuring again delay(100);
+} 
+16
